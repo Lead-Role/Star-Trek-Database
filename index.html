@@ -1,0 +1,990 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Star Trek Database - LCARS</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+    margin: 0;
+    overflow: hidden;
+    font-family: 'Orbitron', sans-serif;
+    background: radial-gradient(circle at bottom right, 
+        #ff9933, 
+        #ff9933 20%, 
+        black 70%);
+    height: 100vh;
+}
+
+.lcars-title-bar {
+    background-color: #ff9933;
+    padding: 20px;
+    text-align: center;
+    font-size: 24px;
+    font-weight: bold;
+    border-top-left-radius: 50px;
+    color: #000;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    box-shadow: 0 0 20px rgba(255, 153, 51, 0.8);
+}
+
+footer.lcars-footer {
+    background-color: #800020;
+    padding: 15px 0;
+    color: #ffff00;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    text-align: center;
+    border-top: 4px solid #ff9933;
+    font-size: 16pt;
+    font-weight: bold;
+    box-sizing: border-box;
+    line-height: 1.2;
+}
+
+.lcars-main {
+    background-color: #001f3f;
+    background-image: radial-gradient(black 10%, transparent 10%);
+    background-size: 20px 20px;
+    color: #ffcc33;
+    border-radius: 0 25px 25px 0;
+    border: 4px solid #ff9933;
+    padding: 30px;
+    width: 70%;
+    max-width: 1200px;
+    box-sizing: border-box;
+    height: calc(100vh - 130px);
+    overflow-y: auto;
+    scrollbar-width: none;
+    text-align: center;
+}
+
+.lcars-main h2, 
+.lcars-main h3 {
+    text-align: left;
+    color: #ffffff;
+    margin-top: 20px;
+}
+
+.lcars-main p {
+    font-family: Arial, sans-serif;
+    font-size: 18pt;
+    color: #ffcc33;
+    margin-top: 15px;
+    line-height: 1.5;
+    text-align: justify;
+}
+
+.lcars-button-panel {
+    position: absolute;
+    right: 0;
+    top: 70px;
+    width: calc(25% + 65px);
+    height: calc(100vh - 145px);
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+    border-left: 4px solid #ff9933;
+}
+
+.lcars-button {
+    color: #e0e0e0;
+    font-size: 14pt;
+    border: 2px solid white;
+    padding: 10px;
+    cursor: pointer;
+    border-radius: 10px;
+    margin-bottom: 8px;
+    width: 100%;
+    text-align: center;
+    transition: all 0.2s ease;
+    box-shadow: 0 0 30px rgba(255, 153, 51, 1);
+}
+
+.lcars-button:hover {
+    background-color: #ff9933;
+    color: #000;
+    box-shadow: 0 0 40px rgba(255, 153, 51, 1);
+    transform: scale(1.05);
+}
+
+.image-container {
+    text-align: center;
+    margin: 20px 0;
+}
+
+.image-container img {
+    max-width: 100%;
+    max-height: 300px;
+    object-fit: contain;
+    border: 2px solid #ffcc33;
+    padding: 10px;
+    background-color: #000;
+}
+
+.lcars-dark-blue {
+    background-color: #336699;
+}
+
+.lcars-dark-violet {
+    background-color: #993366;
+}
+
+.lcars-dark-burgundy {
+    background-color: #800000;
+}
+
+.lcars-dark-green {
+    background-color: #006633;
+}
+
+.lcars-dark-orange {
+    background-color: #CC6600;
+}
+
+.lcars-dark-brown {
+    background-color: #663300;
+}
+
+.lcars-dark-gold {
+    background-color: #B8860B;
+}
+
+select {
+    background-color: black;
+    color: gold;
+    border: 2px solid #ff9933;
+    border-radius: 5px;
+    font-family: Arial, sans-serif;
+    font-size: 16pt;
+    padding: 8px 12px;
+    width: auto;
+    box-sizing: border-box;
+}
+
+option {
+    background-color: black;
+    color: gold;
+    font-family: Arial, sans-serif;
+}
+
+
+
+    </style>
+</head>
+<body>
+
+<div class="lcars-title-bar">
+    Star Trek Database - LCARS
+</div>
+
+<div class="lcars-main" id="main-content">
+    <p>Select a category to view the data.</p>
+    
+</div>
+
+
+<footer class="lcars-footer">
+    LCARS Terminal - Authorized Personnel Only
+</footer>
+
+<script>
+window.onload = function() {
+    initLCARS();
+    addLCARSButtonPanel();
+};
+
+function initLCARS() {
+    document.getElementById('main-content').innerHTML = '<p class="lcars-instruction">Select a category to view the data.</p>';
+}
+
+function createLCARSButton(text, onClickFunction, colorClass) {
+    const button = document.createElement('button');
+    button.classList.add('lcars-button', colorClass);
+    button.innerText = text;
+    button.onclick = onClickFunction;
+    return button;
+}
+
+function addLCARSButtonPanel() {
+    const buttonPanel = document.createElement('div');
+    buttonPanel.classList.add('lcars-button-panel');
+
+    const buttons = [
+        { text: 'Captains', module: 'captains', colorClass: 'lcars-dark-blue' },
+        { text: 'Alien Species', module: 'alien-species', colorClass: 'lcars-dark-violet' },
+        { text: 'Alien Planets', module: 'alien-planets', colorClass: 'lcars-dark-burgundy' },
+        { text: 'Alien Entities', module: 'alien-entities', colorClass: 'lcars-dark-green' },
+        { text: 'Famous Guests', module: 'famous-guests', colorClass: 'lcars-dark-orange' },
+        { text: 'Main Cast', module: 'main-cast', colorClass: 'lcars-dark-brown' },
+        { text: 'Organizations', module: 'organizations', colorClass: 'lcars-dark-violet' },
+        { text: 'Technology', module: 'technology', colorClass: 'lcars-dark-burgundy' },
+        { text: 'Ships', module: 'ships', colorClass: 'lcars-dark-green' },
+        { text: 'Spacial Anomalies', module: 'spacial-anomalies', colorClass: 'lcars-dark-violet' },
+        { text: 'Multiple Role Actors', module: 'multiple-role-actors', colorClass: 'lcars-dark-blue' },
+        { text: 'Emblems and Insignia', module: 'emblems-insignia', colorClass: 'lcars-dark-burgundy' },
+        { text: 'Sign Out of LCARS Terminal', module: 'sign-off', colorClass: 'lcars-dark-gold' }
+    ];
+
+    buttons.forEach(btn => {
+        const button = createLCARSButton(btn.text, () => {
+            if (btn.module === 'sign-off') {
+                signOffLCARS();  
+            } else {
+                loadModule(btn.module);  
+            }
+        }, btn.colorClass);
+        buttonPanel.appendChild(button);
+    });
+
+    document.body.appendChild(buttonPanel);
+}
+
+function loadModule(moduleName) {
+    let url = '';
+    const content = document.getElementById('main-content');
+
+    switch (moduleName) {
+        case 'captains':
+            url = 'https://raw.githubusercontent.com/Lead-Role/Star-Trek-Database/refs/heads/main/Data/Star%20Trek%20Database%20(Captains).json';
+            loadCaptainsPage(url);
+            break;
+        case 'alien-species':
+            url = 'https://raw.githubusercontent.com/Lead-Role/Star-Trek-Database/main/Data/Star%20Trek%20Database%20(Alien%20Species).json';
+            loadAlienSpeciesPage(url);
+            break;
+        case 'alien-planets':
+            url = 'https://raw.githubusercontent.com/Lead-Role/Star-Trek-Database/refs/heads/main/Data/Star%20Trek%20Database%20(Alien%20Planets).json';
+            loadAlienPlanetsPage(url);
+            break;
+        case 'alien-entities':
+            url = 'https://raw.githubusercontent.com/Lead-Role/Star-Trek-Database/refs/heads/main/Data/Star%20Trek%20Database%20(Alien%20Entities).json';
+            loadAlienEntitiesPage(url);
+            break;
+        case 'famous-guests':
+            url = 'https://raw.githubusercontent.com/Lead-Role/Star-Trek-Database/refs/heads/main/Data/Star%20Trek%20Database%20(Famous%20Guests).json';
+            loadFamousGuestsPage(url);
+            break;
+        case 'main-cast':
+            url = 'https://raw.githubusercontent.com/Lead-Role/Star-Trek-Database/refs/heads/main/Data/Star%20Trek%20Database%20(Main%20Crew).json';
+            loadMainCastPage(url);
+            break;
+        case 'organizations':
+            url = 'https://raw.githubusercontent.com/Lead-Role/Star-Trek-Database/refs/heads/main/Data/Star%20Trek%20Database%20(Organizations).json';
+            loadOrganizationsPage(url);
+            break;
+        case 'technology':
+            url = 'https://raw.githubusercontent.com/Lead-Role/Star-Trek-Database/refs/heads/main/Data/Star%20Trek%20Database%20(Technology).json';
+            loadTechnologyPage(url);
+            break;
+        case 'ships':
+            url = 'https://raw.githubusercontent.com/Lead-Role/Star-Trek-Database/refs/heads/main/Data/Star%20Trek%20Database%20(Ships).json';
+            loadShipsPage(url);
+            break;
+        case 'spacial-anomalies':
+            url = 'https://raw.githubusercontent.com/Lead-Role/Star-Trek-Database/refs/heads/main/Data/Star%20Trek%20Database%20(Spacial%20Anomalies).json';
+            loadSpacialAnomaliesPage(url);
+            break;
+        case 'multiple-role-actors':
+            url = 'https://raw.githubusercontent.com/Lead-Role/Star-Trek-Database/refs/heads/main/Data/Star%20Trek%20Database%20(Multiple%20Role%20Guests).json';
+            loadMultipleRoleActorsPage(url);
+            break;
+        case 'emblems-insignia':
+            url = 'https://raw.githubusercontent.com/Lead-Role/Star-Trek-Database/refs/heads/main/Data/Star%20Trek%20Database%20(Emblems%20and%20Insignia).json';
+            loadEmblemsInsigniaPage(url);
+            break;
+        default:
+            content.innerHTML = '<p>Module not found.</p>';
+            return;
+    }
+}
+
+function loadCaptainsPage(url) {
+    const content = document.getElementById('main-content');
+    fetch(url)
+        .then(response => response.json())
+        .then(data => {
+            let dropdownHTML = `
+                <div>
+                    <select id="data-select">
+                        <option value="">Select a Captain</option>
+                    </select>
+                </div>
+            `;
+
+            let dropdownContainer = document.createElement('div');
+            dropdownContainer.innerHTML = dropdownHTML;
+            content.innerHTML = '';
+            content.appendChild(dropdownContainer);
+
+            const selectElement = document.getElementById('data-select');
+
+            data.forEach(item => {
+                const option = document.createElement('option');
+                option.value = `${item['Captain']} - ${item['Actor']}`;
+                option.textContent = `${item['Captain']} - ${item['Actor']}`;
+                selectElement.appendChild(option);
+            });
+
+            let detailsContainer = document.createElement('div');
+            detailsContainer.id = 'details';
+            content.appendChild(detailsContainer);
+
+            selectElement.addEventListener('change', function () {
+                const selectedValue = selectElement.value;
+                const [selectedCaptain, selectedActor] = selectedValue.split(' - ');
+                const selectedData = data.find(item => item['Captain'] === selectedCaptain && item['Actor'] === selectedActor);
+
+                if (selectedData) {
+                    let html = `
+                        <div class="image-container">
+                            <img src="${selectedData['Captain Image']}" alt="${selectedData['Captain']}">
+                        </div>
+                        <h2>${selectedData['Captain']} - ${selectedData['Actor']}</h2>
+                        <h3>About the Captain</h3><p>${selectedData['About the Captain']}</p>
+                        <h3>About the Actor</h3><p>${selectedData['About the Actor']}</p>
+                    `;
+                    detailsContainer.innerHTML = html;
+                }
+            });
+        })
+        .catch(err => {
+            content.innerHTML = '<p>Error loading data.</p>';
+            console.error('Error fetching data:', err);
+        });
+}
+
+function loadAlienSpeciesPage(url) {
+    const content = document.getElementById('main-content');
+    fetch(url)
+        .then(response => response.json())
+        .then(data => {
+            let dropdownHTML = `
+                <div>
+                    <select id="data-select">
+                        <option value="">Select a Species</option>
+                    </select>
+                </div>
+            `;
+
+            let dropdownContainer = document.createElement('div');
+            dropdownContainer.innerHTML = dropdownHTML;
+            content.innerHTML = '';
+            content.appendChild(dropdownContainer);
+
+            const selectElement = document.getElementById('data-select');
+
+            data.forEach(item => {
+                const option = document.createElement('option');
+                option.value = item['Species'];
+                option.textContent = item['Species'];
+                selectElement.appendChild(option);
+            });
+
+            let detailsContainer = document.createElement('div');
+            detailsContainer.id = 'details';
+            content.appendChild(detailsContainer);
+
+            selectElement.addEventListener('change', function () {
+                const selectedValue = selectElement.value;
+                const selectedData = data.find(item => item['Species'] === selectedValue);
+
+                if (selectedData) {
+                    let html = `
+                        <div class="image-container">
+                            <img src="${selectedData['Image']}" alt="${selectedData['Species']}">
+                        </div>
+                        <h2>${selectedData['Species']}</h2>
+                        <h3>Homeworld</h3><p>${selectedData['Homeworld']}</p>
+                        <h3>Description</h3><p>${selectedData['Description']}</p>
+                    `;
+                    detailsContainer.innerHTML = html;
+                }
+            });
+        })
+        .catch(err => {
+            content.innerHTML = '<p>Error loading data.</p>';
+            console.error('Error fetching data:', err);
+        });
+}
+
+function loadAlienPlanetsPage(url) {
+    const content = document.getElementById('main-content');
+    fetch(url)
+        .then(response => response.json())
+        .then(data => {
+            let dropdownHTML = `
+                <div>
+                    <select id="data-select">
+                        <option value="">Select a Planet</option>
+                    </select>
+                </div>
+            `;
+
+            let dropdownContainer = document.createElement('div');
+            dropdownContainer.innerHTML = dropdownHTML;
+            content.innerHTML = '';
+            content.appendChild(dropdownContainer);
+
+            const selectElement = document.getElementById('data-select');
+
+            data.forEach(item => {
+                const option = document.createElement('option');
+                option.value = item['Planet'];
+                option.textContent = item['Planet'];
+                selectElement.appendChild(option);
+            });
+
+            let detailsContainer = document.createElement('div');
+            detailsContainer.id = 'details';
+            content.appendChild(detailsContainer);
+
+            selectElement.addEventListener('change', function () {
+                const selectedValue = selectElement.value;
+                const selectedData = data.find(item => item['Planet'] === selectedValue);
+
+                if (selectedData) {
+                    let html = `
+                        <div class="image-container">
+                            <img src="${selectedData['Image']}" alt="${selectedData['Planet']}">
+                        </div>
+                        <h2>${selectedData['Planet']}</h2>
+                        <h3>Star System</h3><p>${selectedData['Star System']}</p>
+                        <h3>Description</h3><p>${selectedData['Description']}</p>
+                    `;
+                    detailsContainer.innerHTML = html;
+                }
+            });
+        })
+        .catch(err => {
+            content.innerHTML = '<p>Error loading data.</p>';
+            console.error('Error fetching data:', err);
+        });
+}
+
+function loadAlienEntitiesPage(url) {
+    const content = document.getElementById('main-content');
+    fetch(url)
+        .then(response => response.json())
+        .then(data => {
+            let dropdownHTML = `
+                <div>
+                    <select id="data-select">
+                        <option value="">Select an Entity</option>
+                    </select>
+                </div>
+            `;
+
+            let dropdownContainer = document.createElement('div');
+            dropdownContainer.innerHTML = dropdownHTML;
+            content.innerHTML = '';
+            content.appendChild(dropdownContainer);
+
+            const selectElement = document.getElementById('data-select');
+
+            data.forEach(item => {
+                const option = document.createElement('option');
+                option.value = item['Entity'];
+                option.textContent = item['Entity'];
+                selectElement.appendChild(option);
+            });
+
+            let detailsContainer = document.createElement('div');
+            detailsContainer.id = 'details';
+            content.appendChild(detailsContainer);
+
+            selectElement.addEventListener('change', function () {
+                const selectedValue = selectElement.value;
+                const selectedData = data.find(item => item['Entity'] === selectedValue);
+
+                if (selectedData) {
+                    let html = `
+                        <div class="image-container">
+                            <img src="${selectedData['Image']}" alt="${selectedData['Entity']}">
+                        </div>
+                        <h2>${selectedData['Entity']}</h2>
+                        <h3>Details</h3><p>${selectedData['Details']}</p>
+                    `;
+                    detailsContainer.innerHTML = html;
+                }
+            });
+        })
+        .catch(err => {
+            content.innerHTML = '<p>Error loading data.</p>';
+            console.error('Error fetching data:', err);
+        });
+}
+
+function loadFamousGuestsPage(url) {
+    const content = document.getElementById('main-content');
+    fetch(url)
+        .then(response => response.json())
+        .then(data => {
+            let dropdownHTML = `
+                <div>
+                    <select id="data-select">
+                        <option value="">Select a Guest Star</option>
+                    </select>
+                </div>
+            `;
+
+            let dropdownContainer = document.createElement('div');
+            dropdownContainer.innerHTML = dropdownHTML;
+            content.innerHTML = '';
+            content.appendChild(dropdownContainer);
+
+            const selectElement = document.getElementById('data-select');
+
+            data.forEach(item => {
+                const option = document.createElement('option');
+                option.value = item['Guest Name'];
+                option.textContent = item['Guest Name'];
+                selectElement.appendChild(option);
+            });
+
+            let detailsContainer = document.createElement('div');
+            detailsContainer.id = 'details';
+            content.appendChild(detailsContainer);
+
+            selectElement.addEventListener('change', function () {
+                const selectedValue = selectElement.value;
+                const selectedData = data.find(item => item['Guest Name'] === selectedValue);
+
+                if (selectedData) {
+                    let html = `
+                        <div class="image-container">
+                            <img src="${selectedData['Image']}" alt="${selectedData['Guest Name']}">
+                        </div>
+                        <h2>${selectedData['Guest Name']}</h2>
+                        <h3>Role</h3><p>${selectedData['Role'] || 'No role information available.'}</p>
+                        <h3>About the Character</h3><p>${selectedData['About the Character'] || 'No character details available.'}</p>
+                        <h3>About the Guest</h3><p>${selectedData['About the Guest'] || 'No guest details available.'}</p>
+                    `;
+                    detailsContainer.innerHTML = html;
+                }
+            });
+        })
+        .catch(err => {
+            content.innerHTML = '<p>Error loading data.</p>';
+            console.error('Error fetching data:', err);
+        });
+}
+
+function loadMainCastPage(url) {
+    const content = document.getElementById('main-content');
+    fetch(url)
+        .then(response => response.json())
+        .then(data => {
+            let dropdownHTML = `
+                <div>
+                    <select id="data-select">
+                        <option value="">Select a Character</option>
+                    </select>
+                </div>
+            `;
+
+            let dropdownContainer = document.createElement('div');
+            dropdownContainer.innerHTML = dropdownHTML;
+            content.innerHTML = '';
+            content.appendChild(dropdownContainer);
+
+            const selectElement = document.getElementById('data-select');
+
+            data.forEach(item => {
+                const option = document.createElement('option');
+                option.value = item['Character'];
+                option.textContent = item['Character'];
+                selectElement.appendChild(option);
+            });
+
+            let detailsContainer = document.createElement('div');
+            detailsContainer.id = 'details';
+            content.appendChild(detailsContainer);
+
+            selectElement.addEventListener('change', function () {
+                const selectedValue = selectElement.value;
+                const selectedData = data.find(item => item['Character'] === selectedValue);
+
+                if (selectedData) {
+                    let html = `
+                        <div class="image-container">
+                            <img src="${selectedData['Image']}" alt="${selectedData['Character']}">
+                        </div>
+                        <h2>${selectedData['Character']}</h2>
+                        <h3>Species</h3><p>${selectedData['Species']}</p>
+                        <h3>Portrayed By</h3><p>${selectedData['Portrayed By']}</p>
+                        <h3>Details</h3><p>${selectedData['Details']}</p>
+                    `;
+                    detailsContainer.innerHTML = html;
+                }
+            });
+        })
+        .catch(err => {
+            content.innerHTML = '<p>Error loading data.</p>';
+            console.error('Error fetching data:', err);
+        });
+}
+
+function loadOrganizationsPage(url) {
+    const content = document.getElementById('main-content');
+    fetch(url)
+        .then(response => response.json())
+        .then(data => {
+            let dropdownHTML = `
+                <div>
+                    <select id="data-select">
+                        <option value="">Select an Organization</option>
+                    </select>
+                </div>
+            `;
+
+            let dropdownContainer = document.createElement('div');
+            dropdownContainer.innerHTML = dropdownHTML;
+            content.innerHTML = '';
+            content.appendChild(dropdownContainer);
+
+            const selectElement = document.getElementById('data-select');
+
+            data.forEach(item => {
+                const option = document.createElement('option');
+                option.value = item['Organization'];
+                option.textContent = item['Organization'];
+                selectElement.appendChild(option);
+            });
+
+            let detailsContainer = document.createElement('div');
+            detailsContainer.id = 'details';
+            content.appendChild(detailsContainer);
+
+            selectElement.addEventListener('change', function () {
+                const selectedValue = selectElement.value;
+                const selectedData = data.find(item => item['Organization'] === selectedValue);
+
+                if (selectedData) {
+                    let html = `
+                        <div class="image-container">
+                            <img src="${selectedData['Image']}" alt="${selectedData['Organization']}">
+                        </div>
+                        <h2>${selectedData['Organization']}</h2>
+                        <h3>Affiliation</h3><p>${selectedData['Affiliation']}</p>
+                        <h3>Details</h3><p>${selectedData['Details']}</p>
+                    `;
+                    detailsContainer.innerHTML = html;
+                }
+            });
+        })
+        .catch(err => {
+            content.innerHTML = '<p>Error loading data.</p>';
+            console.error('Error fetching data:', err);
+        });
+}
+
+function loadTechnologyPage(url) {
+    const content = document.getElementById('main-content');
+    fetch(url)
+        .then(response => response.json())
+        .then(data => {
+            let dropdownHTML = `
+                <div>
+                    <select id="data-select">
+                        <option value="">Select a Technology</option>
+                    </select>
+                </div>
+            `;
+
+            let dropdownContainer = document.createElement('div');
+            dropdownContainer.innerHTML = dropdownHTML;
+            content.innerHTML = '';
+            content.appendChild(dropdownContainer);
+
+            const selectElement = document.getElementById('data-select');
+
+            data.forEach(item => {
+                const option = document.createElement('option');
+                option.value = item['Device'];
+                option.textContent = item['Device'];
+                selectElement.appendChild(option);
+            });
+
+            let detailsContainer = document.createElement('div');
+            detailsContainer.id = 'details';
+            content.appendChild(detailsContainer);
+
+            selectElement.addEventListener('change', function () {
+                const selectedValue = selectElement.value;
+                const selectedData = data.find(item => item['Device'] === selectedValue);
+
+                if (selectedData) {
+                    let html = `
+                        <div class="image-container">
+                            <img src="${selectedData['Image']}" alt="${selectedData['Device']}">
+                        </div>
+                        <h2>${selectedData['Device']}</h2>
+                        <h3>Technology Type</h3><p>${selectedData['Technology Type']}</p>
+                        <h3>Function</h3><p>${selectedData['Function']}</p>
+                        <h3>Description</h3><p>${selectedData['Description']}</p>
+                    `;
+                    detailsContainer.innerHTML = html;
+                }
+            });
+        })
+        .catch(err => {
+            content.innerHTML = '<p>Error loading data.</p>';
+            console.error('Error fetching data:', err);
+        });
+}
+
+function loadShipsPage(url) {
+    const content = document.getElementById('main-content');
+    fetch(url)
+        .then(response => response.json())
+        .then(data => {
+            let dropdownHTML = `
+                <div>
+                    <select id="affiliation-select">
+                        <option value="">Select an Affiliation</option>
+                    </select>
+                    <select id="ship-select">
+                        <option value="">Select a Ship</option>
+                    </select>
+                </div>
+            `;
+
+            let dropdownContainer = document.createElement('div');
+            dropdownContainer.innerHTML = dropdownHTML;
+            content.innerHTML = '';
+            content.appendChild(dropdownContainer);
+
+            const affiliationSelect = document.getElementById('affiliation-select');
+            const shipSelect = document.getElementById('ship-select');
+
+            const uniqueAffiliations = [...new Set(data.map(item => item['Affiliation']))];
+            uniqueAffiliations.forEach(affiliation => {
+                const option = document.createElement('option');
+                option.value = affiliation;
+                option.textContent = affiliation;
+                affiliationSelect.appendChild(option);
+            });
+
+            let detailsContainer = document.createElement('div');
+            detailsContainer.id = 'details';
+            content.appendChild(detailsContainer);
+
+            affiliationSelect.addEventListener('change', function () {
+                const selectedAffiliation = affiliationSelect.value;
+                shipSelect.innerHTML = '<option value="">Select a Ship</option>';
+                const filteredShips = data.filter(item => item['Affiliation'] === selectedAffiliation);
+
+                filteredShips.forEach(item => {
+                    const option = document.createElement('option');
+                    option.value = item['Ship'];
+                    option.textContent = item['Ship'];
+                    shipSelect.appendChild(option);
+                });
+            });
+
+            shipSelect.addEventListener('change', function () {
+                const selectedShip = shipSelect.value;
+                const selectedData = data.find(item => item['Ship'] === selectedShip);
+
+                if (selectedData) {
+                    let html = `
+                        <div class="image-container">
+                            <img src="${selectedData['Image']}" alt="${selectedData['Ship']}">
+                        </div>
+                        <h2>${selectedData['Ship']}</h2>
+                        <h3>Affiliation</h3><p>${selectedData['Affiliation']}</p>
+                        <h3>Class</h3><p>${selectedData['Class']}</p>
+                        <h3>Propulsion</h3><p>${selectedData['Propulsion']}</p>
+                        <h3>Details</h3><p>${selectedData['Details']}</p>
+                    `;
+                    detailsContainer.innerHTML = html;
+                }
+            });
+        })
+        .catch(err => {
+            content.innerHTML = '<p>Error loading data.</p>';
+            console.error('Error fetching data:', err);
+        });
+}
+
+function loadSpacialAnomaliesPage(url) {
+    const content = document.getElementById('main-content');
+    fetch(url)
+        .then(response => response.json())
+        .then(data => {
+            let dropdownHTML = `
+                <div>
+                    <select id="data-select">
+                        <option value="">Select an Anomaly</option>
+                    </select>
+                </div>
+            `;
+
+            let dropdownContainer = document.createElement('div');
+            dropdownContainer.innerHTML = dropdownHTML;
+            content.innerHTML = '';
+            content.appendChild(dropdownContainer);
+
+            const selectElement = document.getElementById('data-select');
+
+            data.forEach(item => {
+                const option = document.createElement('option');
+                option.value = item['Anomoly Name'];
+                option.textContent = item['Anomoly Name'];
+                selectElement.appendChild(option);
+            });
+
+            let detailsContainer = document.createElement('div');
+            detailsContainer.id = 'details';
+            content.appendChild(detailsContainer);
+
+            selectElement.addEventListener('change', function () {
+                const selectedValue = selectElement.value;
+                const selectedData = data.find(item => item['Anomoly Name'] === selectedValue);
+
+                if (selectedData) {
+                    let html = `
+                        <div class="image-container">
+                            <img src="${selectedData['Image']}" alt="${selectedData['Anomoly Name']}">
+                        </div>
+                        <h2>${selectedData['Anomoly Name']}</h2>
+                        <h3>Description</h3><p>${selectedData['Description']}</p>
+                    `;
+                    detailsContainer.innerHTML = html;
+                }
+            });
+        })
+        .catch(err => {
+            content.innerHTML = '<p>Error loading data.</p>';
+            console.error('Error fetching data:', err);
+        });
+}
+
+function loadMultipleRoleActorsPage(url) {
+    const content = document.getElementById('main-content');
+    fetch(url)
+        .then(response => response.json())
+        .then(data => {
+            let dropdownHTML = `
+                <div>
+                    <select id="data-select">
+                        <option value="">Select an Actor</option>
+                    </select>
+                </div>
+            `;
+
+            let dropdownContainer = document.createElement('div');
+            dropdownContainer.innerHTML = dropdownHTML;
+            content.innerHTML = '';
+            content.appendChild(dropdownContainer);
+
+            const selectElement = document.getElementById('data-select');
+
+            data.forEach(item => {
+                const option = document.createElement('option');
+                option.value = item['Actor Name'];
+                option.textContent = item['Actor Name'];
+                selectElement.appendChild(option);
+            });
+
+            let detailsContainer = document.createElement('div');
+            detailsContainer.id = 'details';
+            content.appendChild(detailsContainer);
+
+            selectElement.addEventListener('change', function () {
+                const selectedValue = selectElement.value;
+                const selectedData = data.find(item => item['Actor Name'] === selectedValue);
+
+                if (selectedData) {
+                    let html = `
+                        <div class="image-container">
+                            <img src="${selectedData['Image']}" alt="${selectedData['Actor Name']}">
+                        </div>
+                        <h2>${selectedData['Actor Name']}</h2>
+                        <h3>Star Trek Roles</h3><p>${selectedData['Star Trek Roles']}</p>
+                        <h3>Mini Bio</h3><p>${selectedData['Mini Bio']}</p>
+                    `;
+                    detailsContainer.innerHTML = html;
+                }
+            });
+        })
+        .catch(err => {
+            content.innerHTML = '<p>Error loading data.</p>';
+            console.error('Error fetching data:', err);
+        });
+}
+
+function loadEmblemsInsigniaPage(url) {
+    const content = document.getElementById('main-content');
+    fetch(url)
+        .then(response => response.json())
+        .then(data => {
+            let dropdownHTML = `
+                <div>
+                    <select id="data-select">
+                        <option value="">Select a Emblem / Insignia</option>
+                    </select>
+                </div>
+            `;
+
+            let dropdownContainer = document.createElement('div');
+            dropdownContainer.innerHTML = dropdownHTML;
+            content.innerHTML = '';
+            content.appendChild(dropdownContainer);
+
+            const selectElement = document.getElementById('data-select');
+
+            data.forEach(item => {
+                const option = document.createElement('option');
+                option.value = `${item['Franchise']} - ${item['Emblem / Insignia Name']}`;
+                option.textContent = `${item['Franchise']} - ${item['Emblem / Insignia Name']}`;
+                selectElement.appendChild(option);
+            });
+
+            let detailsContainer = document.createElement('div');
+            detailsContainer.id = 'details';
+            content.appendChild(detailsContainer);
+
+            selectElement.addEventListener('change', function () {
+                const selectedValue = selectElement.value;
+                const [selectedFranchise, selectedInsignia] = selectedValue.split(' - ');
+                const selectedData = data.find(item => item['Franchise'] === selectedFranchise && item['Emblem / Insignia Name'] === selectedInsignia);
+
+                if (selectedData) {
+                    let html = `
+                        <div class="image-container">
+                            <img src="${selectedData['Image']}" alt="${selectedData['Emblem / Insignia Name']}">
+                        </div>
+                        <h2>${selectedData['Emblem / Insignia Name']}</h2>
+                        <h3>Affiliation</h3><p>${selectedData['Affiliation']}</p>
+                        <h3>Reference</h3><p>${selectedData['Reference']}</p>
+                    `;
+                    detailsContainer.innerHTML = html;
+                }
+            });
+        })
+        .catch(err => {
+            content.innerHTML = '<p>Error loading data.</p>';
+            console.error('Error fetching data:', err);
+        });
+}
+
+function signOffLCARS() {
+    const content = document.getElementById('main-content');
+    content.innerHTML = '';  
+
+    const signOffImage = document.createElement('img');
+    signOffImage.src = 'https://raw.githubusercontent.com/Lead-Role/Star-Trek-Database/refs/heads/main/LCARS%20-%20Logged%20Out.jpg';
+    signOffImage.classList.add('sign-off-image');
+    content.appendChild(signOffImage);
+}
+
+</script>
+
+
+</body>
+</html>
